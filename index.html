@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Val? 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f4d4d4;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .card h1 {
+            color: #c93855;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .card p {
+            color: #c93855;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .heart-icon {
+            color: #c93855;
+            font-size: 24px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-yes {
+            background: #ff0000;
+            color: white;
+        }
+
+        .btn-yes:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+
+        .btn-no {
+            background: white;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-no:hover {
+            background: #f5f5f5;
+            transform: scale(1.05);
+        }
+
+        .video-container {
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .celebration-card {
+            display: none;
+        }
+
+        .celebration-card.active {
+            display: block;
+        }
+
+        .celebration-card h1 {
+            font-size: 52px;
+        }
+
+        .celebration-card p {
+            font-size: 22px;
+        }
+
+        .single-button {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .loading-text {
+            color: #c93855;
+            font-size: 16px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .loading-text.active {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .btn-yes:active {
+            animation: pulse 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Question Card -->
+        <div class="card" id="questionCard">
+            <h1>Will You<br>Be my val?</h1>
+            <p>Because Love is nothing without you.</p>
+            <div class="heart-icon">♥</div>
+            <div class="buttons">
+                <button class="btn btn-yes" id="yesBtn">Yes</button>
+                <button class="btn btn-no" id="noBtn">No</button>
+            </div>
+        </div>
+
+        <!-- Celebration Card (Hidden Initially) -->
+        <div class="card celebration-card" id="celebrationCard">
+            <h1>Yayyy!!!</h1>
+            <p>We're in this for life!</p>
+            <div class="heart-icon">♥</div>
+            <div class="single-button">
+                <button class="btn btn-no" id="talkBtn">Now we're talking!</button>
+            </div>
+            <p class="loading-text" id="loadingText">Sending message... 💕</p>
+        </div>
+
+        <!-- Video Container -->
+        <div class="video-container">
+            <video id="catVideo" autoplay loop muted playsinline>
+                <source src="cat-excited.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - UPDATE THIS with the sender's WhatsApp number
+        const WHATSAPP_NUMBER = '+2347065930480'; // Replace with actual number (include country code, no + or spaces)
+        const WHATSAPP_MESSAGE = encodeURIComponent("Yes my love, I'll do this Val with you forever ❤️");
+        
+        // Button text variations for "No" button
+        const noButtonTexts = ['Really?', 'Oh C\'mon', 'Think again', 'Think again', 'Think again'];
+        let noClickCount = 0;
+
+        // Elements
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const questionCard = document.getElementById('questionCard');
+        const celebrationCard = document.getElementById('celebrationCard');
+        const catVideo = document.getElementById('catVideo');
+        const loadingText = document.getElementById('loadingText');
+        const talkBtn = document.getElementById('talkBtn');
+
+        // Video sources for different states
+        const videos = {
+            excited: 'cat-excited.mp4',      // Initial excited cat
+            skeptical: 'cat-skeptical.mp4',  // When they click "No"
+            celebrating: 'cat-celebrating.mp4' // When they click "Yes"
+        };
+
+        // Handle "No" button click
+        noBtn.addEventListener('click', function() {
+            // Cycle through the button texts
+            const textIndex = noClickCount % noButtonTexts.length;
+            noBtn.textContent = noButtonTexts[textIndex];
+            noClickCount++;
+
+            // Change video to skeptical cat
+            changeVideo(videos.skeptical);
+
+            // Optional: Add a shake animation to the button
+            noBtn.style.animation = 'none';
+            setTimeout(() => {
+                noBtn.style.animation = 'pulse 0.3s ease';
+            }, 10);
+        });
+
+        // Handle "Yes" button click
+        yesBtn.addEventListener('click', function() {
+            // Hide question card, show celebration card
+            questionCard.style.display = 'none';
+            celebrationCard.classList.add('active');
+
+            // Change video to celebrating cat
+            changeVideo(videos.celebrating);
+
+            // Wait 3 seconds, then redirect to WhatsApp
+            setTimeout(() => {
+                loadingText.classList.add('active');
+                
+                setTimeout(() => {
+                    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
+                    window.location.href = whatsappUrl;
+                }, 1000);
+            }, 2000);
+        });
+
+        // Optional: Handle "Now we're talking!" button (same as Yes)
+        talkBtn.addEventListener('click', function() {
+            loadingText.classList.add('active');
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
+            window.location.href = whatsappUrl;
+        });
+
+        // Function to change video source
+        function changeVideo(videoSrc) {
+            catVideo.src = videoSrc;
+            catVideo.load();
+            catVideo.play();
+        }
+
+        // Ensure video autoplays on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            catVideo.play().catch(function(error) {
+                console.log('Autoplay prevented:', error);
+            });
+        });
+    </script>
+</body>
+</html>
