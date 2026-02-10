@@ -245,8 +245,8 @@
 
     <script>
         // Configuration - UPDATE THIS with the sender's WhatsApp number
-        const WHATSAPP_NUMBER = '+2347065930480'; // Replace with actual number (include country code, no + or spaces)
-        const WHATSAPP_MESSAGE = encodeURIComponent("Yes my love, I'll do this Val with you forever");
+        const WHATSAPP_NUMBER = '1234567890'; // Replace with actual number (include country code, no + or spaces)
+        const WHATSAPP_MESSAGE = encodeURIComponent("Yes my love, I'll do this Val with you forever ❤️");
         
         // Button text variations for "No" button
         const noButtonTexts = ['Really?', 'Oh C\'mon', 'Think again', 'Think again', 'Think again'];
@@ -268,6 +268,29 @@
             celebrating: 'cat-celebrating.mp4' // When they click "Yes"
         };
 
+        // Preload all videos into memory (the "pocket")
+        const preloadedVideos = {};
+        
+        function preloadAllVideos() {
+            Object.keys(videos).forEach(key => {
+                const video = document.createElement('video');
+                video.src = videos[key];
+                video.preload = 'auto';
+                video.loop = true;
+                video.muted = true;
+                video.playsInline = true;
+                
+                // Load the video data
+                video.load();
+                
+                // Store in our "pocket"
+                preloadedVideos[key] = video;
+            });
+        }
+        
+        // Start preloading immediately
+        preloadAllVideos();
+
         // Handle "No" button click
         noBtn.addEventListener('click', function() {
             // Cycle through the button texts
@@ -275,8 +298,8 @@
             noBtn.textContent = noButtonTexts[textIndex];
             noClickCount++;
 
-            // Change video to skeptical cat
-            changeVideo(videos.skeptical);
+            // Change video to skeptical cat (now instant!)
+            changeVideo('skeptical');
 
             // Optional: Add a shake animation to the button
             noBtn.style.animation = 'none';
@@ -291,8 +314,8 @@
             questionCard.style.display = 'none';
             celebrationCard.classList.add('active');
 
-            // Change video to celebrating cat
-            changeVideo(videos.celebrating);
+            // Change video to celebrating cat (now instant!)
+            changeVideo('celebrating');
 
             // Wait 3 seconds, then redirect to WhatsApp
             setTimeout(() => {
@@ -301,8 +324,8 @@
                 setTimeout(() => {
                     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
                     window.location.href = whatsappUrl;
-                }, 2000);
-            }, 6000);
+                }, 1000);
+            }, 2000);
         });
 
         // Optional: Handle "Now we're talking!" button (same as Yes)
@@ -312,11 +335,22 @@
             window.location.href = whatsappUrl;
         });
 
-        // Function to change video source
-        function changeVideo(videoSrc) {
-            catVideo.src = videoSrc;
-            catVideo.load();
-            catVideo.play();
+        // Function to change video source (now uses preloaded videos)
+        function changeVideo(videoKey) {
+            // Get the preloaded video from our "pocket"
+            const newVideo = preloadedVideos[videoKey];
+            
+            if (newVideo && newVideo.readyState >= 2) {
+                // Video is ready! Clone its source to the visible video element
+                catVideo.src = newVideo.src;
+                catVideo.load();
+                catVideo.play().catch(err => console.log('Play error:', err));
+            } else {
+                // Fallback: load directly if preload didn't complete
+                catVideo.src = videos[videoKey];
+                catVideo.load();
+                catVideo.play().catch(err => console.log('Play error:', err));
+            }
         }
 
         // Ensure video autoplays on mobile
