@@ -236,8 +236,9 @@
 
         <!-- Video Container -->
         <div class="video-container">
-            <video id="catVideo" autoplay loop muted playsinline>
+            <video id="catVideo" autoplay loop muted playsinline webkit-playsinline>
                 <source src="cat-excited.webm" type="video/webm">
+                <source src="cat-excited.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -261,11 +262,20 @@
         const loadingText = document.getElementById('loadingText');
         const talkBtn = document.getElementById('talkBtn');
 
-        // Video sources for different states
+        // Video sources for different states (supports both webm and mp4)
         const videos = {
-            excited: 'cat-excited.webm',      // Initial excited cat
-            skeptical: 'cat-skeptical.webm',  // When they click "No"
-            celebrating: 'cat-celebrating.webm' // When they click "Yes"
+            excited: {
+                webm: 'cat-excited.webm',
+                mp4: 'cat-excited.mp4'
+            },
+            skeptical: {
+                webm: 'cat-skeptical.webm',
+                mp4: 'cat-skeptical.mp4'
+            },
+            celebrating: {
+                webm: 'cat-celebrating.webm',
+                mp4: 'cat-celebrating.mp4'
+            }
         };
 
         // Preload all videos into memory (the "pocket")
@@ -274,11 +284,23 @@
         function preloadAllVideos() {
             Object.keys(videos).forEach(key => {
                 const video = document.createElement('video');
-                video.src = videos[key];
+                
+                // Add both webm and mp4 sources for maximum compatibility
+                const sourceWebm = document.createElement('source');
+                sourceWebm.src = videos[key].webm;
+                sourceWebm.type = 'video/webm';
+                video.appendChild(sourceWebm);
+                
+                const sourceMp4 = document.createElement('source');
+                sourceMp4.src = videos[key].mp4;
+                sourceMp4.type = 'video/mp4';
+                video.appendChild(sourceMp4);
+                
                 video.preload = 'auto';
                 video.loop = true;
                 video.muted = true;
                 video.playsInline = true;
+                video.setAttribute('webkit-playsinline', 'true');
                 
                 // Load the video data
                 video.load();
@@ -325,7 +347,7 @@
                     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
                     window.location.href = whatsappUrl;
                 }, 1000);
-            }, 4000);
+            }, 2000);
         });
 
         // Optional: Handle "Now we're talking!" button (same as Yes)
@@ -335,22 +357,40 @@
             window.location.href = whatsappUrl;
         });
 
-        // Function to change video source (now uses preloaded videos)
+        // Function to change video source (now uses preloaded videos with fallback)
         function changeVideo(videoKey) {
-            // Get the preloaded video from our "pocket"
-            const newVideo = preloadedVideos[videoKey];
+            // Clear existing sources
+            catVideo.innerHTML = '';
             
-            if (newVideo && newVideo.readyState >= 2) {
-                // Video is ready! Clone its source to the visible video element
-                catVideo.src = newVideo.src;
-                catVideo.load();
-                catVideo.play().catch(err => console.log('Play error:', err));
+            // Get the preloaded video
+            const preloaded = preloadedVideos[videoKey];
+            
+            if (preloaded && preloaded.readyState >= 2) {
+                // Video is preloaded - copy its sources
+                const sourceWebm = document.createElement('source');
+                sourceWebm.src = videos[videoKey].webm;
+                sourceWebm.type = 'video/webm';
+                catVideo.appendChild(sourceWebm);
+                
+                const sourceMp4 = document.createElement('source');
+                sourceMp4.src = videos[videoKey].mp4;
+                sourceMp4.type = 'video/mp4';
+                catVideo.appendChild(sourceMp4);
             } else {
-                // Fallback: load directly if preload didn't complete
-                catVideo.src = videos[videoKey];
-                catVideo.load();
-                catVideo.play().catch(err => console.log('Play error:', err));
+                // Fallback: add sources directly
+                const sourceWebm = document.createElement('source');
+                sourceWebm.src = videos[videoKey].webm;
+                sourceWebm.type = 'video/webm';
+                catVideo.appendChild(sourceWebm);
+                
+                const sourceMp4 = document.createElement('source');
+                sourceMp4.src = videos[videoKey].mp4;
+                sourceMp4.type = 'video/mp4';
+                catVideo.appendChild(sourceMp4);
             }
+            
+            catVideo.load();
+            catVideo.play().catch(err => console.log('Play error:', err));
         }
 
         // Ensure video autoplays on mobile
