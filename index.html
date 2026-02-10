@@ -21,37 +21,74 @@
             padding: 20px;
         }
 
+        @media (max-height: 700px) {
+            body {
+                padding: 15px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            body {
+                padding: 10px;
+            }
+        }
+
         .container {
             width: 100%;
             max-width: 400px;
-            max-height: 80%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 15px;
+        }
+
+        @media (max-height: 700px) {
+            .container {
+                gap: 15px;
+            }
         }
 
         .card {
             background: white;
             border-radius: 20px;
-            padding: 40px 30px;
+            padding: 25px 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
         }
 
+        @media (max-height: 700px) {
+            .card {
+                padding: 30px 25px;
+            }
+        }
+
         .card h1 {
             color: #c93855;
-            font-size: 48px;
+            font-size: 40px;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             line-height: 1.2;
+        }
+
+        @media (max-height: 700px) {
+            .card h1 {
+                font-size: 40px;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .card h1 {
+                font-size: 36px;
+                margin-bottom: 12px;
+            }
         }
 
         .card p {
             color: #c93855;
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 16px;
+            margin-bottom: 15px;
         }
 
         .heart-icon {
@@ -63,18 +100,18 @@
             display: flex;
             gap: 15px;
             justify-content: center;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .btn {
-            padding: 15px 40px;
+            padding: 12px 30px;
             border: none;
             border-radius: 12px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 120px;
+            min-width: 110px;
         }
 
         .btn-yes {
@@ -104,11 +141,25 @@
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+        }
+
+        @media (max-height: 700px) {
+            .video-container {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .video-container {
+                max-height: 250px;
+            }
         }
 
         video {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             display: block;
         }
 
@@ -121,11 +172,11 @@
         }
 
         .celebration-card h1 {
-            font-size: 52px;
+            font-size: 44px;
         }
 
         .celebration-card p {
-            font-size: 22px;
+            font-size: 18px;
         }
 
         .single-button {
@@ -187,14 +238,15 @@
         <div class="video-container">
             <video id="catVideo" autoplay loop muted playsinline>
                 <source src="cat-excited.mp4" type="video/mp4">
+                Your browser does not support the video tag.
             </video>
         </div>
     </div>
 
     <script>
         // Configuration - UPDATE THIS with the sender's WhatsApp number
-        const WHATSAPP_NUMBER = '+2347065930480'; // Replace with actual number (include country code, no + or spaces)
-        const WHATSAPP_MESSAGE = encodeURIComponent("Yes my love, I'll do this Val with you forever.");
+        const WHATSAPP_NUMBER = '1234567890'; // Replace with actual number (include country code, no + or spaces)
+        const WHATSAPP_MESSAGE = encodeURIComponent("Yes my love, I'll do this Val with you forever ❤️");
         
         // Button text variations for "No" button
         const noButtonTexts = ['Really?', 'Oh C\'mon', 'Think again', 'Think again', 'Think again'];
